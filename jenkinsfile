@@ -1,0 +1,37 @@
+def remoteServer = 'ubuntu@18.209.179.6:/var/www/'
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                sh "npm install"
+                sh "npm run build"
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh "rsync -ravz build/ ${remoteServer}"
+            }
+        }
+    }
+
+    post {
+        always{
+            cleanWs()
+        }
+        success {
+            // Actions à effectuer en cas de succès de la pipeline
+        }
+        failure {
+            // Actions à effectuer en cas d'échec de la pipeline
+        }
+    }
+}
